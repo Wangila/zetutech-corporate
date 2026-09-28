@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --animate-flow: flow 1.8s linear infinite;
+  @keyframes flow {
+    from {
+      stroke-dashoffset: 28;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+html {
+  color-scheme: dark;
+  background-color: var(--color-slate-950);
+}
