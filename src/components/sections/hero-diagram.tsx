@@ -15,108 +15,194 @@ const layer = {
   letterSpacing: "0.2em",
   textAnchor: "start" as const,
 };
+// Amazon Bedrock AgentCore hosts the orchestrator and its tools; drawn as a platform boundary.
+const platformFrame = {
+  fill: "#f59e0b",
+  fillOpacity: 0.03,
+  stroke: "#f59e0b",
+  strokeOpacity: 0.35,
+  strokeDasharray: "5 4",
+};
 
-const links = [
-  // clients → gateway
-  "M90 70 V88 Q90 100 102 100 H248 Q260 100 260 112 V130",
-  "M260 70 V130",
-  "M430 70 V88 Q430 100 418 100 H272 Q260 100 260 112 V130",
-  // gateway → services
-  "M260 186 V204 Q260 216 248 216 H80 Q68 216 68 228 V246",
-  "M260 186 V204 Q260 216 248 216 H208 Q196 216 196 228 V246",
-  "M260 186 V204 Q260 216 272 216 H312 Q324 216 324 228 V246",
-  "M260 186 V204 Q260 216 272 216 H440 Q452 216 452 228 V246",
-  // services → data
-  "M68 286 V304 Q68 316 80 316 H138 Q150 316 150 328 V336",
-  "M196 286 V304 Q196 316 184 316 H162 Q150 316 150 328 V336",
-  "M324 286 V304 Q324 316 336 316 H358 Q370 316 370 328 V336",
-  "M452 286 V304 Q452 316 440 316 H382 Q370 316 370 328 V336",
+const description =
+  "Agentic AI reference architecture: web, chat, and partner clients route through an API gateway with guardrails into Amazon Bedrock AgentCore, which hosts an agent orchestrator running a plan, act, observe loop. The orchestrator calls an LLM, MCP tools, RAG search, and a human review step. MCP tools act on business APIs and SaaS systems and read PostgreSQL business data; RAG search uses a vector database; evals and traces and an event stream complete the platform.";
+
+/** Orthogonal connector from (x1, y1) down to (x2, y2), turning at y = turn. */
+function elbow(x1: number, y1: number, x2: number, y2: number, turn: number) {
+  if (x1 === x2) return `M${x1} ${y1} V${y2}`;
+  const r = Math.min(12, Math.abs(x2 - x1) / 2);
+  const dir = x2 > x1 ? 1 : -1;
+  return [
+    `M${x1} ${y1} V${turn - r}`,
+    `Q${x1} ${turn} ${x1 + dir * r} ${turn}`,
+    `H${x2 - dir * r}`,
+    `Q${x2} ${turn} ${x2} ${turn + r}`,
+    `V${y2}`,
+  ].join(" ");
+}
+
+// Agent row (inside AgentCore) and the data row beneath it.
+const agentColumns = [68, 196, 324, 452];
+const AGENT_TOP = 316;
+const AGENT_BOTTOM = 356;
+const DATA_TOP = 410;
+
+const agents = [
+  { text: "LLM" },
+  { text: "MCP TOOLS" },
+  { text: "RAG SEARCH" },
+  { text: "HUMAN REVIEW", human: true },
 ];
 
-// Subset of links that carry animated "traffic", with staggered start times.
+const dataNodes = [
+  { cx: 52, text: "EVALS · TRACES", from: 0 },
+  { cx: 156, text: "APIS · SAAS", from: 1 },
+  { cx: 260, text: "POSTGRESQL", from: 1, cylinder: true },
+  { cx: 364, text: "VECTOR DB", from: 2, cylinder: true },
+  { cx: 468, text: "EVENT STREAM", from: 3 },
+];
+
+const links = {
+  clients: [
+    elbow(90, 70, 260, 110, 90),
+    elbow(260, 70, 260, 110, 90),
+    elbow(430, 70, 260, 110, 90),
+  ],
+  gateway: elbow(260, 154, 260, 206, 180),
+  agents: agentColumns.map((x) => elbow(260, 270, x, AGENT_TOP, 292)),
+  data: dataNodes.map(({ cx, from, cylinder }) =>
+    elbow(agentColumns[from], AGENT_BOTTOM, cx, cylinder ? DATA_TOP - 2 : DATA_TOP, 383),
+  ),
+};
+
+const allLinks = [...links.clients, links.gateway, ...links.agents, ...links.data];
+
+// Animated traffic. "reverse" paths carry results back up to the orchestrator.
 const flows = [
-  { d: links[0], delay: "0s" },
-  { d: links[1], delay: "0.9s" },
-  { d: links[2], delay: "0.45s" },
-  { d: links[4], delay: "0.3s" },
-  { d: links[6], delay: "1.2s" },
-  { d: links[8], delay: "0.6s" },
-  { d: links[9], delay: "1.5s" },
+  { d: links.clients[0], delay: "0s" },
+  { d: links.clients[1], delay: "0.9s" },
+  { d: links.clients[2], delay: "0.45s" },
+  { d: links.gateway, delay: "0.2s" },
+  { d: links.agents[0], delay: "0.3s" },
+  { d: links.agents[0], delay: "1.2s", reverse: true },
+  { d: links.agents[1], delay: "0.7s" },
+  { d: links.agents[1], delay: "1.5s", reverse: true },
+  { d: links.agents[2], delay: "1.1s" },
+  { d: links.agents[3], delay: "0.5s" },
+  { d: links.data[1], delay: "0.8s" },
+  { d: links.data[2], delay: "1.4s" },
+  { d: links.data[3], delay: "1.0s" },
 ];
 
 const clients = [
   { x: 20, text: "WEB APP" },
-  { x: 190, text: "MOBILE" },
+  { x: 190, text: "CHAT · SLACK" },
   { x: 360, text: "PARTNER API" },
 ];
 
-const services = [
-  { x: 12, text: "IDENTITY" },
-  { x: 140, text: "MATCHING" },
-  { x: 268, text: "PAYMENTS" },
-  { x: 396, text: "AI AGENTS" },
-];
+function FlowPath({ d, delay, reverse }: { d: string; delay: string; reverse?: boolean }) {
+  return (
+    <path
+      d={d}
+      strokeDasharray="6 22"
+      className="animate-flow opacity-80 motion-reduce:animate-none motion-reduce:opacity-0"
+      style={{ animationDelay: delay, animationDirection: reverse ? "reverse" : undefined }}
+    />
+  );
+}
 
-const description =
-  "Reference architecture: web, mobile, and partner clients route through an API gateway to identity, matching, payments, and AI agent services, backed by PostgreSQL and an event stream.";
+function LoopRing({ cx, cy }: { cx: number; cy: number }) {
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={8}
+      fill="none"
+      stroke="#f59e0b"
+      strokeWidth={1.5}
+      strokeDasharray="3 4"
+      className="origin-center animate-[spin_6s_linear_infinite] [transform-box:fill-box] motion-reduce:animate-none"
+    />
+  );
+}
 
-// Phone-sized variant: the same four layers stacked vertically, with larger type.
+// Phone-sized variant: the same layers stacked vertically, with larger type.
 const compactLayers = [
-  { title: "CLIENTS", detail: "web · mobile · partner api" },
-  { title: "API GATEWAY", detail: "auth · rate limit", accent: true },
-  { title: "SERVICES", detail: "identity · matching · payments · ai" },
-  { title: "DATA", detail: "postgresql · event stream" },
+  { title: "CLIENTS", detail: "web · chat · partner api", top: 8 },
+  { title: "API GATEWAY", detail: "auth · guardrails", top: 92 },
+  { title: "AGENT ORCHESTRATOR", detail: "plan → act → observe", top: 196, accent: true },
+  { title: "AGENTS & TOOLS", detail: "llm · mcp tools · rag · human review", top: 280 },
+  { title: "DATA & SYSTEMS", detail: "apis · saas · postgresql · vector db · evals", top: 380 },
 ];
+const COMPACT_HEIGHT = 56;
+// Connector x positions, kept near the centre so the AgentCore labels fit either side.
+const COMPACT_LINES = [140, 180];
 
 export function CompactDiagram({ className }: { className?: string }) {
-  const top = (index: number) => 8 + index * 84;
+  const gaps = compactLayers.slice(1).map((next, index) => ({
+    from: compactLayers[index].top + COMPACT_HEIGHT,
+    to: next.top,
+    index,
+  }));
   return (
-    <svg viewBox="0 0 320 324" className={cn("h-auto w-full", className)} role="img" aria-label={description}>
+    <svg viewBox="0 0 320 444" className={cn("h-auto w-full", className)} role="img" aria-label={description}>
+      {/* AgentCore platform boundary around the orchestrator and its tools */}
+      <rect x={2} y={170} width={316} height={178} rx={12} {...platformFrame} />
+      <text x={14} y={186} {...layer} fontSize={9} fill="#f59e0b" letterSpacing="0.1em">
+        BEDROCK AGENTCORE
+      </text>
+      <text x={306} y={186} {...layer} fontSize={8} letterSpacing="0.06em" textAnchor="end">
+        runtime · memory
+      </text>
+
       <g fill="none" stroke="#1e293b" strokeWidth={1.5}>
-        {compactLayers.slice(1).map((_, index) => (
+        {gaps.map(({ from, to, index }) => (
           <g key={index}>
-            <path d={`M110 ${top(index) + 56} V${top(index + 1)}`} />
-            <path d={`M210 ${top(index) + 56} V${top(index + 1)}`} />
+            {COMPACT_LINES.map((x) => (
+              <path key={x} d={`M${x} ${from} V${to}`} />
+            ))}
           </g>
         ))}
       </g>
       <g fill="none" stroke="#f59e0b" strokeWidth={1.5} strokeLinecap="round">
-        {compactLayers.slice(1).map((_, index) => (
+        {gaps.map(({ from, to, index }) => (
           <g key={index}>
-            <path
-              d={`M110 ${top(index) + 56} V${top(index + 1)}`}
-              strokeDasharray="6 22"
-              className="animate-flow opacity-80 motion-reduce:animate-none motion-reduce:opacity-0"
-              style={{ animationDelay: `${index * 0.4}s` }}
-            />
-            <path
-              d={`M210 ${top(index) + 56} V${top(index + 1)}`}
-              strokeDasharray="6 22"
-              className="animate-flow opacity-80 motion-reduce:animate-none motion-reduce:opacity-0"
-              style={{ animationDelay: `${index * 0.4 + 0.9}s` }}
+            <FlowPath d={`M${COMPACT_LINES[0]} ${from} V${to}`} delay={`${index * 0.4}s`} />
+            {/* results flow back up between the orchestrator and its agents */}
+            <FlowPath
+              d={`M${COMPACT_LINES[1]} ${from} V${to}`}
+              delay={`${index * 0.4 + 0.9}s`}
+              reverse={index === 2}
             />
           </g>
         ))}
       </g>
-      {compactLayers.map(({ title, detail, accent }, index) => (
+
+      {compactLayers.map(({ title, detail, top, accent }) => (
         <g key={title}>
+          {accent && <rect x={10} y={top} width={300} height={COMPACT_HEIGHT} rx={10} fill="#f59e0b" opacity={0.08} />}
           <rect
             x={10}
-            y={top(index)}
+            y={top}
             width={300}
-            height={56}
+            height={COMPACT_HEIGHT}
             rx={10}
-            fill="#0b1222"
+            fill={accent ? "none" : "#0b1222"}
             stroke={accent ? "#f59e0b" : "#334155"}
-            strokeOpacity={accent ? 0.6 : 1}
+            strokeOpacity={accent ? 0.8 : 1}
           />
-          {accent && (
-            <circle cx={28} cy={top(index) + 28} r={3} fill="#f59e0b" className="animate-pulse motion-reduce:animate-none" />
-          )}
-          <text x={160} y={top(index) + 25} {...label} fontSize={13} fill="#e2e8f0">
+          {accent && <LoopRing cx={30} cy={top + 28} />}
+          <text x={160} y={top + 25} {...label} fontSize={13} fill="#e2e8f0">
             {title}
           </text>
-          <text x={160} y={top(index) + 43} {...label} fontSize={10} fill="#64748b" letterSpacing="0.04em">
+          <text
+            x={160}
+            y={top + 43}
+            {...label}
+            fontSize={10}
+            fill={accent ? "#fbbf24" : "#64748b"}
+            letterSpacing="0.04em"
+          >
             {detail}
           </text>
         </g>
@@ -131,34 +217,41 @@ export function HeroDiagram({ className }: { className?: string }) {
       <div className="rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4 shadow-2xl shadow-black/40 backdrop-blur-sm sm:p-6">
         <CompactDiagram className="sm:hidden" />
         <svg
-          viewBox="0 0 520 410"
+          viewBox="0 0 520 462"
           className="hidden h-auto w-full sm:block"
           role="img"
           aria-label={description}
         >
+          <defs>
+            <filter id="orchestrator-glow" x="-20%" y="-50%" width="140%" height="200%">
+              <feGaussianBlur stdDeviation="10" />
+            </filter>
+          </defs>
+
           {/* layer labels */}
           <text x={20} y={20} {...layer}>CLIENTS</text>
-          <text x={370} y={156} {...layer}>EDGE</text>
-          <text x={132} y={236} {...layer} textAnchor="middle">SERVICES</text>
-          <text x={450} y={362} {...layer}>DATA</text>
+          <text x={360} y={136} {...layer}>EDGE</text>
+
+          {/* Amazon Bedrock AgentCore platform boundary */}
+          <rect x={4} y={176} width={512} height={196} rx={14} {...platformFrame} />
+          <text x={16} y={193} {...layer} fill="#f59e0b" letterSpacing="0.16em">
+            AMAZON BEDROCK AGENTCORE
+          </text>
+          <text x={504} y={193} {...layer} fontSize={8} letterSpacing="0.06em" textAnchor="end">
+            runtime · memory · identity · gateway · observability
+          </text>
 
           {/* static wiring */}
           <g fill="none" stroke="#1e293b" strokeWidth={1.5}>
-            {links.map((d) => (
+            {allLinks.map((d) => (
               <path key={d} d={d} />
             ))}
           </g>
 
           {/* animated traffic */}
           <g fill="none" stroke="#f59e0b" strokeWidth={1.5} strokeLinecap="round">
-            {flows.map(({ d, delay }) => (
-              <path
-                key={d}
-                d={d}
-                strokeDasharray="6 22"
-                className="animate-flow opacity-80 motion-reduce:animate-none motion-reduce:opacity-0"
-                style={{ animationDelay: delay }}
-              />
+            {flows.map((flow) => (
+              <FlowPath key={`${flow.d}-${flow.delay}`} {...flow} />
             ))}
           </g>
 
@@ -171,31 +264,52 @@ export function HeroDiagram({ className }: { className?: string }) {
           ))}
 
           {/* gateway */}
-          <rect x={170} y={130} width={180} height={56} rx={10} fill="#0b1222" stroke="#f59e0b" strokeOpacity={0.6} />
-          <circle cx={186} cy={146} r={3} fill="#f59e0b" className="animate-pulse motion-reduce:animate-none" />
-          <text x={260} y={156} {...label} fill="#e2e8f0">API GATEWAY</text>
-          <text x={260} y={174} {...label} fontSize={9} fill="#64748b">auth · rate limit</text>
+          <rect x={170} y={110} width={180} height={44} rx={10} {...node} />
+          <text x={260} y={129} {...label} fill="#e2e8f0">API GATEWAY</text>
+          <text x={260} y={145} {...label} fontSize={9} fill="#64748b">auth · guardrails</text>
 
-          {/* services */}
-          {services.map(({ x, text }) => (
+          {/* agent orchestrator */}
+          <rect x={120} y={206} width={280} height={64} rx={12} fill="#f59e0b" opacity={0.25} filter="url(#orchestrator-glow)" />
+          <rect x={120} y={206} width={280} height={64} rx={12} fill="#0b1222" stroke="#f59e0b" strokeOpacity={0.8} />
+          <LoopRing cx={146} cy={238} />
+          <text x={268} y={234} {...label} fontSize={12} fill="#f8fafc">AGENT ORCHESTRATOR</text>
+          <text x={268} y={253} {...label} fontSize={9} fill="#fbbf24">plan → act → observe</text>
+
+          {/* agents & tools */}
+          {agents.map(({ text, human }, index) => (
             <g key={text}>
-              <rect x={x} y={246} width={112} height={40} rx={8} {...node} />
-              <text x={x + 56} y={270} {...label}>{text}</text>
+              <rect
+                x={agentColumns[index] - 56}
+                y={AGENT_TOP}
+                width={112}
+                height={AGENT_BOTTOM - AGENT_TOP}
+                rx={8}
+                {...node}
+                strokeDasharray={human ? "4 3" : undefined}
+              />
+              <text x={agentColumns[index]} y={AGENT_TOP + 24} {...label} fontSize={10}>{text}</text>
             </g>
           ))}
 
-          {/* postgres cylinder */}
-          <path d="M75 346 V392 A75 10 0 0 0 225 392 V346" {...node} />
-          <ellipse cx={150} cy={346} rx={75} ry={10} {...node} />
-          <text x={150} y={378} {...label}>POSTGRESQL</text>
-
-          {/* event stream */}
-          <rect x={295} y={336} width={150} height={44} rx={8} {...node} />
-          <text x={370} y={362} {...label}>EVENT STREAM</text>
+          {/* data & systems */}
+          {dataNodes.map(({ cx, text, cylinder }) =>
+            cylinder ? (
+              <g key={text}>
+                <path d={`M${cx - 46} ${DATA_TOP + 6} V${DATA_TOP + 36} A46 8 0 0 0 ${cx + 46} ${DATA_TOP + 36} V${DATA_TOP + 6}`} {...node} />
+                <ellipse cx={cx} cy={DATA_TOP + 6} rx={46} ry={8} {...node} />
+                <text x={cx} y={DATA_TOP + 28} {...label} fontSize={9}>{text}</text>
+              </g>
+            ) : (
+              <g key={text}>
+                <rect x={cx - 48} y={DATA_TOP} width={96} height={40} rx={8} {...node} />
+                <text x={cx} y={DATA_TOP + 24} {...label} fontSize={9}>{text}</text>
+              </g>
+            ),
+          )}
         </svg>
       </div>
       <figcaption className="mt-4 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-slate-600">
-        Fig. 01 — Reference Architecture
+        Fig. 01 — Agentic AI Reference Architecture
       </figcaption>
     </figure>
   );

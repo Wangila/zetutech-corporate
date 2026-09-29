@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { company, seo, services } from "@/content/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,29 +16,50 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const description =
-  "ZetuTech LLC engineers high-fidelity platforms and multi-sided marketplaces designed for absolute data integrity and verifiable human execution. Based in Somerset, NJ.";
-
 export const metadata: Metadata = {
+  metadataBase: new URL(seo.url),
   title: {
-    default: "ZetuTech LLC | Architecting Trust in the Digital Economy",
+    default: seo.title,
     template: "%s | ZetuTech LLC",
   },
-  description,
-  applicationName: "ZetuTech LLC",
-  authors: [{ name: "ZetuTech LLC" }],
+  description: seo.description,
+  applicationName: company.name,
+  authors: [{ name: company.name }],
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "ZetuTech LLC",
-    title: "ZetuTech LLC | Architecting Trust in the Digital Economy",
-    description,
+    url: "/",
+    siteName: company.name,
+    title: seo.title,
+    description: seo.description,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZetuTech LLC | Architecting Trust in the Digital Economy",
-    description,
+    title: seo.title,
+    description: seo.description,
   },
+};
+
+// Structured data so search engines can show ZetuTech as a local professional service.
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: company.name,
+  url: seo.url,
+  logo: `${seo.url}/apple-icon`,
+  image: `${seo.url}/opengraph-image`,
+  description: seo.description,
+  email: company.contactEmail,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Somerset",
+    addressRegion: "NJ",
+    addressCountry: "US",
+  },
+  areaServed: ["US", "KE"],
+  founder: { "@type": "Person", name: "Brian Wangila", jobTitle: "Senior Software Architect" },
+  knowsAbout: services.items.map((item) => item.title),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -46,6 +69,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-slate-950 font-sans text-slate-50 selection:bg-amber-500 selection:text-white">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-amber-500 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-slate-950"
@@ -55,6 +84,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         {children}
         <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );

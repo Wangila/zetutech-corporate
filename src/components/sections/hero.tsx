@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Landmark, Layers, type LucideIcon } from "lucide-react";
 // Photo by X (@disruptxn) on Unsplash (Unsplash License): unsplash.com/photos/IgUR1iX0mqM
 import heroPhoto from "@/assets/hero-engineers.jpg";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -7,6 +7,25 @@ import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { HeroDiagram } from "@/components/sections/hero-diagram";
 import { bookingHref, hero } from "@/content/site";
+import { cn } from "@/lib/cn";
+
+/** One headline line ending in an icon (in the line's own colour), kept on the same line as the last word. */
+function HeadlineLine({ text, icon: Icon, className }: { text: string; icon: LucideIcon; className?: string }) {
+  const split = text.lastIndexOf(" ");
+  return (
+    <span className={cn("block", className)}>
+      {text.slice(0, split + 1)}
+      <span className="whitespace-nowrap">
+        {text.slice(split + 1)}
+        <Icon
+          aria-hidden
+          strokeWidth={2.25}
+          className="ml-[0.2em] inline-block size-[0.7em] -translate-y-[0.06em] align-baseline"
+        />
+      </span>
+    </span>
+  );
+}
 
 export function Hero() {
   return (
@@ -43,9 +62,11 @@ export function Hero() {
       <Container className="relative grid grid-cols-1 items-center gap-16 py-24 md:py-32 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
         <div className="text-center lg:text-left">
           <Eyebrow>{hero.eyebrow}</Eyebrow>
-          <h1 className="mt-6 mb-6 text-5xl font-bold tracking-tighter md:text-7xl lg:text-5xl xl:text-6xl">
-            <span className="block">{hero.headline[0]}</span>
-            <span className="block text-slate-500">{hero.headline[1]}</span>
+          {/* One band spanning the text column (within the page margins) lifts the headline off the photo. */}
+          <h1 className="mt-6 mb-8 rounded-[0.2em] bg-slate-900/70 px-[0.28em] pt-[0.14em] pb-[0.2em] text-[2.6rem] leading-tight font-bold tracking-tighter shadow-lg shadow-black/30 backdrop-blur-sm max-[420px]:text-[2rem] sm:text-5xl md:text-6xl lg:text-[2.6rem] xl:text-[3.25rem]">
+            {/* Icons stand in for full stops: layers for scale, pillars for decisions that hold. */}
+            <HeadlineLine text={hero.headline[0]} icon={Layers} />
+            <HeadlineLine text={hero.headline[1]} icon={Landmark} className="text-slate-500" />
           </h1>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-400 md:text-xl lg:mx-0 lg:text-lg">
             {hero.subtitle}
