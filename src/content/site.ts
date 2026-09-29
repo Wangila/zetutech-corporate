@@ -2,13 +2,21 @@ export const company = {
   name: "ZetuTech LLC",
   location: "Somerset, New Jersey",
   shortLocation: "Somerset, NJ",
-  legalEmail: "brian.wangila@gmail.com",
-  contactEmail: "brian.wangila@gmail.com",
+  legalEmail: "brian@zetutech.com",
+  contactEmail: "brian@zetutech.com",
   // Set to a Cal.com / Calendly URL to enable direct booking; until then, CTAs route to /contact.
   bookingUrl: null as string | null,
 } as const;
 
 export const bookingHref = company.bookingUrl ?? "/contact";
+
+/** Site-wide SEO defaults, used by metadata, the sitemap, robots, and structured data. */
+export const seo = {
+  url: "https://zetutech.com",
+  title: "ZetuTech LLC | Software Architecture & Advisory",
+  description:
+    "Boutique software architecture firm in Somerset, NJ. We help growing companies modernize legacy platforms, scale on AWS, and put agentic AI into production, led directly by a senior architect.",
+} as const;
 
 export const nav = [
   { label: "Services", href: "/#services" },
@@ -21,12 +29,13 @@ export const nav = [
 
 export const hero = {
   eyebrow: "Software Architecture & Advisory",
-  headline: ["Systems that scale.", "Decisions that hold."],
+  headline: ["Systems that scale", "Decisions that hold"],
   subtitle:
     "We help growing companies modernize legacy platforms, scale on the cloud, and ship AI that works in production. You work directly with a senior architect, not a sales team.",
   primaryCta: "Book a Consultation",
   secondaryCta: { label: "View Services", href: "/#services" },
-  proofPoints: ["15+ years in enterprise architecture", "Senior-led, every engagement", "Somerset, NJ · Remote-first"],} as const;
+  proofPoints: ["15+ years in enterprise architecture", "Senior-led, every engagement", "Somerset, NJ · Remote-first"],
+} as const;
 
 export const services = {
   eyebrow: "Services",
@@ -283,11 +292,11 @@ export const footer = {
   links: [
     { label: "Contact", href: "/contact" },
     { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
+    { label: "Terms of Use", href: "/terms" },
   ],
   copyright: "© 2026 ZetuTech LLC. All rights reserved.",
 } as const;
 
 export const legal = {
-  effectiveDate: "September 27, 2026",
+  effectiveDate: "September 29, 2026",
 } as const;
