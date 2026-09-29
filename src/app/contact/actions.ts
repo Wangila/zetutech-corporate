@@ -75,7 +75,7 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: process.env.CONTACT_FROM_EMAIL ?? "ZetuTech Website <onboarding@resend.dev>",
+        from: process.env.CONTACT_FROM_EMAIL ?? "ZetuTech Website <website@mail.zetutech.com>",
         to: [process.env.CONTACT_TO_EMAIL ?? company.contactEmail],
         reply_to: values.email,
         subject: `New enquiry: ${values.service} — ${values.name}`,
