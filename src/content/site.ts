@@ -4,12 +4,20 @@ export const company = {
   shortLocation: "Somerset, NJ",
   legalEmail: "brian@zetutech.com",
   contactEmail: "brian@zetutech.com",
-  // Set to a Cal.com / Calendly URL to enable direct booking; until then, CTAs route to /contact.
-  bookingUrl: null as string | null,
+  // Google Calendar appointment schedule; set to null to route booking CTAs to /contact instead.
+  bookingUrl:
+    "https://calendar.google.com/appointments/schedules/AcZssZ0HFt_vY03t4q4QgOnvqRA5tki2UzKrtYsBEUSPQwjcM13EOhX1PuSK5g70XLmNHeVQrTPfiOn8" as
+      | string
+      | null,
   linkedinUrl: "https://www.linkedin.com/in/brian-wangila-mba-9a0bb84/",
 } as const;
 
 export const bookingHref = company.bookingUrl ?? "/contact";
+
+/** The booking page is external, so booking CTAs open it in a new tab and keep the site open. */
+export const bookingLinkProps = company.bookingUrl
+  ? ({ target: "_blank", rel: "noopener noreferrer" } as const)
+  : {};
 
 /** Site-wide SEO defaults, used by metadata, the sitemap, robots, and structured data. */
 export const seo = {

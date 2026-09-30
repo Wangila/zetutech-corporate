@@ -6,7 +6,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { HeroDiagram } from "@/components/sections/hero-diagram";
-import { bookingHref, hero } from "@/content/site";
+import { bookingHref, bookingLinkProps, hero } from "@/content/site";
 import { cn } from "@/lib/cn";
 
 /** One headline line ending in an icon (in the line's own colour), kept on the same line as the last word. */
@@ -74,7 +74,7 @@ export function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-            <ButtonLink href={bookingHref} className="w-full sm:w-auto">
+            <ButtonLink href={bookingHref} {...bookingLinkProps} className="w-full sm:w-auto">
               {hero.primaryCta}
               <ArrowRight className="size-4" aria-hidden />
             </ButtonLink>

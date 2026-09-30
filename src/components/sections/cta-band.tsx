@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
-import { bookingHref, ctaBand } from "@/content/site";
+import { bookingHref, bookingLinkProps, ctaBand } from "@/content/site";
 
 export function CtaBand() {
   return (
@@ -18,7 +18,7 @@ export function CtaBand() {
               {ctaBand.description}
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <ButtonLink href={bookingHref} className="w-full sm:w-auto">
+              <ButtonLink href={bookingHref} {...bookingLinkProps} className="w-full sm:w-auto">
                 {ctaBand.primary}
                 <ArrowRight className="size-4" aria-hidden />
               </ButtonLink>
