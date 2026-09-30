@@ -6,6 +6,7 @@ export const company = {
   contactEmail: "brian@zetutech.com",
   // Set to a Cal.com / Calendly URL to enable direct booking; until then, CTAs route to /contact.
   bookingUrl: null as string | null,
+  linkedinUrl: "https://www.linkedin.com/in/brian-wangila-mba-9a0bb84/",
 } as const;
 
 export const bookingHref = company.bookingUrl ?? "/contact";
@@ -21,7 +22,7 @@ export const seo = {
 export const nav = [
   { label: "Services", href: "/#services" },
   { label: "Engagements", href: "/#engagements" },
-  { label: "Talent", href: "/#talent" },
+  { label: "Talent", href: "/talent" },
   { label: "Approach", href: "/#approach" },
   { label: "Work", href: "/#work" },
   { label: "About", href: "/#about" },
@@ -133,6 +134,12 @@ export const talent = {
   title: "Architect-vetted engineers, on demand.",
   description:
     "Extend your team with software engineers screened and technically vetted by a senior architect — not a recruiter. Contract or direct hire, from the United States and Kenya.",
+  // Short version shown on the home page; the full offer lives at /talent.
+  teaser: {
+    description:
+      "Need hands, not just a blueprint? We supply software engineers screened by a senior architect, on contract or as direct hires.",
+    cta: "Explore Engineering Talent",
+  },
   models: [
     {
       name: "Team Extension",
@@ -221,32 +228,120 @@ export const work = {
   description:
     "ZetuTech doesn’t only design platforms for clients — we engineer and operate our own. AssignNet is where our architecture principles are tested in production.",
   flagship: {
-    eyebrow: "Built In-House",
-    title: "AssignNet: The Standard in Verifiable Matching",
+    eyebrow: "Built & Operated In-House",
+    title: "AssignNet: a trust-first, two-sided marketplace",
     description:
-      "A multi-sided marketplace connecting clients with vetted academic and technical specialists. Every engagement is gated by identity verification, integrity scanning, and milestone-based delivery, with escrow-backed settlement so both sides of the market can transact with confidence.",
-    status: "Platform Currently in Closed Beta",
+      "AssignNet matches clients with vetted specialists for research and technical work. We designed, built, and run the whole platform: competitive bidding, milestone-based delivery, real-time collaboration, and a mediation process for when things go wrong.",
+    status: "Live in production",
+    caseStudy: { href: "/work/assignnet", cta: "Read the case study" },
   },
   features: [
     {
       icon: "shield-check",
-      title: "Triple-Gate Integrity",
+      title: "Verification & Integrity Pipeline",
       description:
-        "Mandatory asynchronous integrity scans and strict structural variance enforcement on every deliverable.",
+        "Identity and credential checks (KYC) before anyone can bid, and automated AI and plagiarism scanning on every delivery through the Copyleaks API.",
     },
     {
       icon: "circle-dollar-sign",
-      title: "Direct Escrow Settlement",
-      description: "Secure Peer-to-Peer USD routing, released only against verified milestones.",
+      title: "Two Payment Rails",
+      description:
+        "Stripe escrow that releases funds only on approval, alongside pay-after-review settlement over M-Pesa or bank transfer.",
     },
   ],
 } as const;
 
 export type FeatureIcon = (typeof work.features)[number]["icon"];
 
+/** Technical case study at /work/assignnet. Facts are drawn from the AssignNet codebase. */
+export const assignnetCaseStudy = {
+  eyebrow: "Case Study",
+  title: "Engineering trust into a two-sided marketplace.",
+  summary:
+    "AssignNet lets clients post research and technical work, receive bids from vetted specialists, and pay only when the work checks out. We architected, built, and operate the whole platform. Here is how it works under the hood.",
+  facts: [
+    { label: "Role", value: "Architecture, build & operations" },
+    { label: "Frontend", value: "Next.js 16 · TypeScript · Vercel" },
+    { label: "Backend", value: "FastAPI · Python 3.12 · Railway" },
+    { label: "Data", value: "PostgreSQL (Supabase) · Prisma" },
+  ],
+  challenge: {
+    title: "The problem",
+    paragraphs: [
+      "A marketplace where strangers exchange money for work fails the moment either side stops trusting it. Clients need to know the specialist is who they claim to be and that the work is original. Specialists need to know they will be paid. The platform needs both sides to stay on-platform, across the United States and Kenya.",
+      "That turns a simple listing site into a set of hard problems: identity verification, automated quality gates, escrowed payments on two continents, and moderation that works without a large operations team.",
+    ],
+  },
+  architecture: {
+    title: "Architecture at a glance",
+    description:
+      "A modular monolith: one FastAPI service organized into 17 feature modules, with a typed Next.js frontend and a single PostgreSQL database. Simple to operate, with clear seams if a module ever needs to be split out.",
+    layers: [
+      {
+        name: "Web app",
+        detail: "Next.js 16 on Vercel. Typed forms with Zod, hardened security headers, Playwright end-to-end tests.",
+      },
+      {
+        name: "API",
+        detail:
+          "FastAPI on Railway, containerized, with health-checked deploys. Modules for tasks, bids, integrity, wallet, payouts, support, and admin.",
+      },
+      {
+        name: "Data",
+        detail: "PostgreSQL on Supabase with 31 Prisma models and 48 versioned migrations. File storage on Supabase Storage.",
+      },
+      {
+        name: "Integrations",
+        detail: "Stripe (escrow and Connect payouts), Paystack (KES payouts), Copyleaks (AI and plagiarism scans), Resend (email), ClamAV.",
+      },
+    ],
+  },
+  decisions: {
+    title: "Key design decisions",
+    items: [
+      {
+        title: "Quality gates as an explicit state machine",
+        body: "Every delivery passes an integrity scan before the client can see it. Rather than a flag on the task, the scan is modeled as task states: scanning, passed, revision required, and failure paths. Files stay hidden until a scan passes. When the scanning provider's webhook is late, the task moves to a pending state for automatic recovery, and after four hours it escalates to a human auditor, so no task can get stuck silently.",
+      },
+      {
+        title: "Our own ledger, not the payment provider, is the source of truth",
+        body: "Every payment event writes a row to an internal ledger of credits and debits, each with a clear status: pending, completed, or reversed. Balances, escrow holds, and fees are computed from the ledger, not by calling Stripe. That makes wallets fast, auditable, and correct even when a provider is slow or down.",
+      },
+      {
+        title: "Two payment rails for two markets",
+        body: "Clients can pay through Stripe escrow, where funds release only on approval, or a pay-after-review track. Specialists are paid through Stripe Connect or, in Kenya, through Paystack to M-Pesa or a bank account. If the platform's local balance is short, payouts queue for retry instead of failing.",
+      },
+      {
+        title: "Deterministic moderation, by design",
+        body: "Messages are checked for shared contact details and attempts to take payment off-platform, and flagged for review without blocking the conversation. Abusive language is blocked or censored by tier, and repeat offenders are flagged automatically. All of it is rule-based rather than machine learning, so every decision is predictable and explainable.",
+      },
+      {
+        title: "Defense in depth for accounts and files",
+        body: "Uploads are checked twice: the file's actual bytes must match its declared type, then it is scanned for malware. Accounts support authenticator-app MFA, sessions are tracked, and security events are audit-logged. When payout details change, the owner gets a one-time link to freeze the account if it wasn't them.",
+      },
+    ],
+  },
+  practice: {
+    title: "How it's engineered",
+    items: [
+      "90+ backend tests across unit, integration, and security suites",
+      "Browser end-to-end tests with Playwright",
+      "Typed end to end: Pydantic on the API, TypeScript and Zod on the web",
+      "Containerized API with health-checked, auto-restarting deploys",
+      "Versioned schema migrations and pre-commit hooks",
+    ],
+  },
+  takeaway: {
+    title: "What this means for your project",
+    body: "The problems AssignNet solves (verification, escrow and payouts, integrity checks, moderation, and reliable third-party integrations) show up in most marketplaces and platforms. We bring these patterns, and the lessons from running them in production, to client engagements.",
+    services: ["Marketplace & Platform Engineering", "Cloud & Microservices Architecture"],
+  },
+} as const;
+
 export const leadership = {
   eyebrow: "About",
   title: "Engineered by Experience.",
+  founder: { name: "Brian Wangila", role: "Founder · Senior Software Architect" },
   paragraphs: [
     "ZetuTech LLC was founded by Brian Wangila, a Senior Software Architect with more than 15 years of experience in system architecture, cloud microservices, and enterprise digital transformation.",
     "That career has been spent migrating legacy enterprise systems, decomposing monoliths into resilient distributed services, and designing platforms where correctness is not optional.",

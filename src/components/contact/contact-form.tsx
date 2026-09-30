@@ -14,7 +14,7 @@ type ContactFormProps = {
 const initialState: ContactState = { status: "idle" };
 
 const inputClass =
-  "mt-2 block w-full rounded-lg border bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/60";
+  "mt-2 block w-full rounded-lg border bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/60";
 
 function fieldClass(hasError: boolean) {
   return cn(inputClass, hasError ? "border-red-500/70" : "border-slate-800 focus:border-amber-500/60");

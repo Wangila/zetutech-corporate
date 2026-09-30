@@ -58,7 +58,12 @@ const organizationJsonLd = {
     addressCountry: "US",
   },
   areaServed: ["US", "KE"],
-  founder: { "@type": "Person", name: "Brian Wangila", jobTitle: "Senior Software Architect" },
+  founder: {
+    "@type": "Person",
+    name: "Brian Wangila",
+    jobTitle: "Senior Software Architect",
+    sameAs: [company.linkedinUrl],
+  },
   knowsAbout: services.items.map((item) => item.title),
 };
 

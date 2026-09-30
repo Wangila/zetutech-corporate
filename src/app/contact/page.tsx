@@ -17,7 +17,7 @@ export default function ContactPage() {
       <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
         <div>
           <Eyebrow>Contact</Eyebrow>
-          <h1 className="mt-4 text-5xl font-bold tracking-tighter md:text-6xl">Let’s talk architecture.</h1>
+          <h1 className="mt-4 text-5xl font-bold tracking-tight md:text-6xl">Let’s talk architecture.</h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
             Tell us where your system is today and where it needs to be. Every enquiry is read personally by
             our founder, and you’ll get a straight answer on whether we’re the right fit.

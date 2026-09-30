@@ -126,99 +126,13 @@ function LoopRing({ cx, cy }: { cx: number; cy: number }) {
   );
 }
 
-// Phone-sized variant: the same layers stacked vertically, with larger type.
-const compactLayers = [
-  { title: "CLIENTS", detail: "web · chat · partner api", top: 8 },
-  { title: "API GATEWAY", detail: "auth · guardrails", top: 92 },
-  { title: "AGENT ORCHESTRATOR", detail: "plan → act → observe", top: 196, accent: true },
-  { title: "AGENTS & TOOLS", detail: "llm · mcp tools · rag · human review", top: 280 },
-  { title: "DATA & SYSTEMS", detail: "apis · saas · postgresql · vector db · evals", top: 380 },
-];
-const COMPACT_HEIGHT = 56;
-// Connector x positions, kept near the centre so the AgentCore labels fit either side.
-const COMPACT_LINES = [140, 180];
-
-export function CompactDiagram({ className }: { className?: string }) {
-  const gaps = compactLayers.slice(1).map((next, index) => ({
-    from: compactLayers[index].top + COMPACT_HEIGHT,
-    to: next.top,
-    index,
-  }));
-  return (
-    <svg viewBox="0 0 320 444" className={cn("h-auto w-full", className)} role="img" aria-label={description}>
-      {/* AgentCore platform boundary around the orchestrator and its tools */}
-      <rect x={2} y={170} width={316} height={178} rx={12} {...platformFrame} />
-      <text x={14} y={186} {...layer} fontSize={9} fill="#f59e0b" letterSpacing="0.1em">
-        BEDROCK AGENTCORE
-      </text>
-      <text x={306} y={186} {...layer} fontSize={8} letterSpacing="0.06em" textAnchor="end">
-        runtime · memory
-      </text>
-
-      <g fill="none" stroke="#1e293b" strokeWidth={1.5}>
-        {gaps.map(({ from, to, index }) => (
-          <g key={index}>
-            {COMPACT_LINES.map((x) => (
-              <path key={x} d={`M${x} ${from} V${to}`} />
-            ))}
-          </g>
-        ))}
-      </g>
-      <g fill="none" stroke="#f59e0b" strokeWidth={1.5} strokeLinecap="round">
-        {gaps.map(({ from, to, index }) => (
-          <g key={index}>
-            <FlowPath d={`M${COMPACT_LINES[0]} ${from} V${to}`} delay={`${index * 0.4}s`} />
-            {/* results flow back up between the orchestrator and its agents */}
-            <FlowPath
-              d={`M${COMPACT_LINES[1]} ${from} V${to}`}
-              delay={`${index * 0.4 + 0.9}s`}
-              reverse={index === 2}
-            />
-          </g>
-        ))}
-      </g>
-
-      {compactLayers.map(({ title, detail, top, accent }) => (
-        <g key={title}>
-          {accent && <rect x={10} y={top} width={300} height={COMPACT_HEIGHT} rx={10} fill="#f59e0b" opacity={0.08} />}
-          <rect
-            x={10}
-            y={top}
-            width={300}
-            height={COMPACT_HEIGHT}
-            rx={10}
-            fill={accent ? "none" : "#0b1222"}
-            stroke={accent ? "#f59e0b" : "#334155"}
-            strokeOpacity={accent ? 0.8 : 1}
-          />
-          {accent && <LoopRing cx={30} cy={top + 28} />}
-          <text x={160} y={top + 25} {...label} fontSize={13} fill="#e2e8f0">
-            {title}
-          </text>
-          <text
-            x={160}
-            y={top + 43}
-            {...label}
-            fontSize={10}
-            fill={accent ? "#fbbf24" : "#64748b"}
-            letterSpacing="0.04em"
-          >
-            {detail}
-          </text>
-        </g>
-      ))}
-    </svg>
-  );
-}
-
 export function HeroDiagram({ className }: { className?: string }) {
   return (
     <figure className={cn("w-full", className)}>
       <div className="rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4 shadow-2xl shadow-black/40 backdrop-blur-sm sm:p-6">
-        <CompactDiagram className="sm:hidden" />
         <svg
           viewBox="0 0 520 462"
-          className="hidden h-auto w-full sm:block"
+          className="h-auto w-full"
           role="img"
           aria-label={description}
         >
@@ -308,7 +222,7 @@ export function HeroDiagram({ className }: { className?: string }) {
           )}
         </svg>
       </div>
-      <figcaption className="mt-4 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-slate-600">
+      <figcaption className="mt-4 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-slate-400">
         Fig. 01 — Agentic AI Reference Architecture
       </figcaption>
     </figure>

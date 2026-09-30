@@ -13,9 +13,9 @@ export function Approach() {
             <li key={step.title} className="relative bg-slate-950 p-8">
               <span className="font-mono text-sm text-amber-500">
                 {String(index + 1).padStart(2, "0")}
-                <span className="text-slate-600"> /{String(approach.steps.length).padStart(2, "0")}</span>
+                <span className="text-slate-500"> /{String(approach.steps.length).padStart(2, "0")}</span>
               </span>
-              <h3 className="mt-6 text-2xl font-bold tracking-tighter">{step.title}</h3>
+              <h3 className="mt-6 text-2xl font-bold tracking-tight">{step.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-slate-400">{step.description}</p>
             </li>
           ))}
