@@ -7,9 +7,10 @@ import { Menu, X } from "lucide-react";
 type MobileMenuProps = {
   items: readonly { label: string; href: string }[];
   ctaHref: string;
+  ctaLinkProps?: { target?: string; rel?: string };
 };
 
-export function MobileMenu({ items, ctaHref }: MobileMenuProps) {
+export function MobileMenu({ items, ctaHref, ctaLinkProps }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export function MobileMenu({ items, ctaHref }: MobileMenuProps) {
           ))}
           <Link
             href={ctaHref}
+            {...ctaLinkProps}
             onClick={close}
             className="mt-2 block rounded-lg bg-amber-500 px-3 py-2.5 text-center text-sm font-semibold text-slate-950"
           >

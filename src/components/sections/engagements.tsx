@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { bookingHref, engagements } from "@/content/site";
+import { bookingHref, bookingLinkProps, engagements } from "@/content/site";
 import { cn } from "@/lib/cn";
 
 export function Engagements() {
@@ -46,6 +46,7 @@ export function Engagements() {
               </ul>
               <ButtonLink
                 href={bookingHref}
+                {...bookingLinkProps}
                 variant={item.featured ? "primary" : "secondary"}
                 className="mt-8 w-full"
               >

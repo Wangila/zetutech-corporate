@@ -12,7 +12,7 @@ import {
 import { BentoCard } from "@/components/ui/bento-card";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { bookingHref, services, type ServiceIcon } from "@/content/site";
+import { bookingHref, bookingLinkProps, services, type ServiceIcon } from "@/content/site";
 
 const icons: Record<ServiceIcon, LucideIcon> = {
   cloud: Cloud,
@@ -56,6 +56,7 @@ export function Services() {
 
           <Link
             href={bookingHref}
+            {...bookingLinkProps}
             className="group flex flex-col justify-between gap-8 rounded-2xl border border-dashed border-slate-700 p-8 transition-colors hover:border-amber-500/60 hover:bg-amber-500/[0.03]"
           >
             <div>

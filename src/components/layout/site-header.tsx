@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
-import { bookingHref, nav } from "@/content/site";
+import { bookingHref, bookingLinkProps, nav } from "@/content/site";
 
 export function Wordmark() {
   return (
@@ -31,11 +31,11 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:block">
-            <ButtonLink href={bookingHref} className="px-4 py-2">
+            <ButtonLink href={bookingHref} {...bookingLinkProps} className="px-4 py-2">
               Book a Call
             </ButtonLink>
           </div>
-          <MobileMenu items={nav} ctaHref={bookingHref} />
+          <MobileMenu items={nav} ctaHref={bookingHref} ctaLinkProps={bookingLinkProps} />
         </div>
       </Container>
     </header>
