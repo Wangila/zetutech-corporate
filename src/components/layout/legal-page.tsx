@@ -23,9 +23,9 @@ export function LegalPage({ title, summary, children }: LegalPageProps) {
 
         <header className="mt-12 border-b border-slate-800 pb-10">
           <Eyebrow className="text-xs">Legal</Eyebrow>
-          <h1 className="mt-4 text-4xl font-bold tracking-tighter md:text-6xl">{title}</h1>
+          <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-6xl">{title}</h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">{summary}</p>
-          <p className="mt-6 font-mono text-xs uppercase tracking-widest text-slate-500">
+          <p className="mt-6 font-mono text-xs uppercase tracking-widest text-slate-400">
             Effective: {legal.effectiveDate}
           </p>
         </header>

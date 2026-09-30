@@ -13,7 +13,7 @@ export function CtaBand() {
             className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.035)_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
           />
           <div className="relative">
-            <h2 className="text-4xl font-bold tracking-tighter md:text-5xl">{ctaBand.title}</h2>
+            <h2 className="text-4xl font-bold tracking-tight md:text-5xl">{ctaBand.title}</h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-400">
               {ctaBand.description}
             </p>

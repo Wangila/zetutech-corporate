@@ -32,7 +32,7 @@ export function Engagements() {
                 </span>
               )}
               <h3 className="text-xl font-semibold tracking-tight">{item.name}</h3>
-              <p className="mt-2 font-mono text-xs uppercase tracking-widest text-slate-500">
+              <p className="mt-2 font-mono text-xs uppercase tracking-widest text-slate-400">
                 {item.duration}
               </p>
               <p className="mt-6 text-sm leading-relaxed text-slate-400">{item.description}</p>

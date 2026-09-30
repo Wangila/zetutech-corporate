@@ -63,8 +63,8 @@ export function Hero() {
         <div className="text-center lg:text-left">
           <Eyebrow>{hero.eyebrow}</Eyebrow>
           {/* One band spanning the text column (within the page margins) lifts the headline off the photo. */}
-          {/* Each line needs ~9.9em (text, icon, band padding); below sm, size to the viewport so neither line wraps. */}
-          <h1 className="mt-6 mb-8 rounded-[0.2em] bg-slate-900/70 px-[0.28em] pt-[0.14em] pb-[0.2em] text-[length:min(2.6rem,calc((100vw_-_3rem)/10.5))] leading-tight font-bold tracking-tighter shadow-lg shadow-black/30 backdrop-blur-sm sm:text-5xl md:text-6xl lg:text-[2.6rem] xl:text-[3.25rem]">
+          {/* Each line needs ~10.4em (text, icon, band padding); below sm, size to the viewport so neither line wraps. */}
+          <h1 className="mt-6 mb-8 rounded-[0.2em] bg-slate-900/70 px-[0.28em] pt-[0.14em] pb-[0.2em] text-[length:min(2.6rem,calc((100vw_-_3rem)/11))] leading-tight font-bold tracking-tight shadow-lg shadow-black/30 backdrop-blur-sm sm:text-5xl md:text-6xl lg:text-[2.6rem] xl:text-[3.25rem]">
             {/* Icons stand in for full stops: layers for scale, pillars for decisions that hold. */}
             <HeadlineLine text={hero.headline[0]} icon={Layers} />
             <HeadlineLine text={hero.headline[1]} icon={Landmark} className="text-slate-500" />
@@ -83,7 +83,7 @@ export function Hero() {
             </ButtonLink>
           </div>
 
-          <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-widest text-slate-500 lg:justify-start">
+          <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-widest text-slate-400 lg:justify-start">
             {hero.proofPoints.map((point) => (
               <li key={point} className="flex items-center gap-2">
                 <span className="size-1 rounded-full bg-amber-500" aria-hidden />
@@ -93,7 +93,8 @@ export function Hero() {
           </ul>
         </div>
 
-        <HeroDiagram className="mx-auto max-w-xl lg:max-w-none" />
+        {/* Phones skip the diagram so services follow the hero directly. */}
+        <HeroDiagram className="mx-auto hidden max-w-xl sm:block lg:max-w-none" />
       </Container>
     </section>
   );

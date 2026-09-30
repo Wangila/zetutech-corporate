@@ -22,7 +22,7 @@ export function TerminalReadout({ title, command, rows, className }: TerminalRea
           <span className="size-2.5 shrink-0 rounded-full bg-slate-700" aria-hidden />
           <span className="size-2.5 shrink-0 rounded-full bg-slate-700" aria-hidden />
           <span className="size-2.5 shrink-0 rounded-full bg-slate-700" aria-hidden />
-          <span className="ml-3 truncate text-xs text-slate-500">{title}</span>
+          <span className="ml-3 truncate text-xs text-slate-400">{title}</span>
         </div>
         <span className="flex shrink-0 items-center gap-2 text-[10px] uppercase tracking-widest text-emerald-400">
           <span className="relative flex size-2">
@@ -33,7 +33,7 @@ export function TerminalReadout({ title, command, rows, className }: TerminalRea
         </span>
       </div>
 
-      <div className="px-5 pt-5 text-slate-500">
+      <div className="px-5 pt-5 text-slate-400">
         <span className="text-amber-500">$</span> {command}
       </div>
 

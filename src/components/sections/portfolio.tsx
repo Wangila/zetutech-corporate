@@ -1,5 +1,6 @@
-import { CircleDollarSign, Lock, ShieldCheck, type LucideIcon } from "lucide-react";
+import { ArrowRight, CircleDollarSign, ShieldCheck, type LucideIcon } from "lucide-react";
 import { BentoCard } from "@/components/ui/bento-card";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -22,21 +23,23 @@ export function Portfolio() {
           <BentoCard className="col-span-full flex flex-col justify-between gap-10 md:p-12 lg:col-span-2 lg:row-span-2">
             <div>
               <Eyebrow className="text-xs">{flagship.eyebrow}</Eyebrow>
-              <h3 className="mt-4 text-3xl font-bold tracking-tighter md:text-4xl">
+              <h3 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
                 {flagship.title}
               </h3>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-400 md:text-lg">
                 {flagship.description}
               </p>
             </div>
-            <button
-              type="button"
-              disabled
-              className="inline-flex w-fit cursor-not-allowed items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/60 px-5 py-3 text-sm font-semibold text-slate-400"
-            >
-              <Lock className="size-4 text-amber-500" aria-hidden />
-              {flagship.status}
-            </button>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+              <ButtonLink href={flagship.caseStudy.href} className="w-full sm:w-fit">
+                {flagship.caseStudy.cta}
+                <ArrowRight className="size-4" aria-hidden />
+              </ButtonLink>
+              <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-emerald-400">
+                <span className="size-2 rounded-full bg-emerald-400" aria-hidden />
+                {flagship.status}
+              </p>
+            </div>
           </BentoCard>
 
           {features.map((feature) => {

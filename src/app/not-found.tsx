@@ -17,11 +17,11 @@ export default function NotFound() {
       />
       <Container className="relative text-center">
         <Eyebrow>Error 404</Eyebrow>
-        <h1 className="mt-6 text-5xl font-bold tracking-tighter md:text-7xl">This route doesn’t resolve.</h1>
+        <h1 className="mt-6 text-5xl font-bold tracking-tight md:text-7xl">This route doesn’t resolve.</h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-400">
           The page you’re looking for has moved or never existed. Let’s get you back to a known-good state.
         </p>
-        <p className="mt-8 font-mono text-sm text-slate-500">
+        <p className="mt-8 font-mono text-sm text-slate-400">
           <span className="text-amber-500">$</span> curl -I zetutech.com/this-page{" "}
           <span className="text-slate-600">→</span> <span className="text-red-400">404 Not Found</span>
         </p>
